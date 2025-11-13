@@ -25,9 +25,9 @@ protected:
 public:
   TDynamicVector(size_t size = 1) : sz(size)
   {
-    if (sz == 0) 
+    if (sz == 0 || sz > MAX_VECTOR_SIZE)
         throw out_of_range("Vector size should be greater than zero");
-    pMem = new T[sz]();
+    pMem = new T[sz];
   }
 
   TDynamicVector(T* arr, size_t s) : sz(s)
@@ -60,9 +60,10 @@ public:
 
   ~TDynamicVector()
   {
-      // проверка на нольптр
-      delete[] pMem;
-      // присвоить 0 
+      if (pMem != nullptr) {
+          delete[] pMem;
+          pMem = nullptr;
+      }
   }
 
   TDynamicVector& operator=(const TDynamicVector& v)
@@ -70,12 +71,15 @@ public:
       if (this == &v) return *this;
 
       if (v.sz == 0) {
-          delete[] pMem; // если уже пусто??
+          if (pMem != nullptr) 
+              delete[] pMem;
+
           pMem = nullptr;
           sz = 0;
+
           return *this;
       }
-      // Если память равна?
+      
       T* newMem = new T[v.sz];
       for (size_t i = 0; i < v.sz; i++) {
           newMem[i] = v.pMem[i];
@@ -91,12 +95,14 @@ public:
   TDynamicVector& operator=(TDynamicVector&& v) noexcept
   {
       if (this == &v) return *this;
-      //?
-      delete[] pMem;
+      if (pMem != nullptr) delete[] pMem;
 
       pMem = v.pMem;
       sz = v.sz;
 
+      v.pMem = nullptr;
+      v.sz = 0;
+      
       return *this;
   }
 
@@ -196,7 +202,11 @@ public:
 
   T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
   {
-      // скалярное умножение двух векторов
+      T result = T() ;
+      for (size_t i = 0; i < sz; ++i) {
+          result += pMem[i] * v.pMem[i];
+      }
+      return result;
   }
 
   friend void swap(TDynamicVector& lhs, TDynamicVector& rhs) noexcept
@@ -235,8 +245,8 @@ class TDynamicMatrix : private TDynamicVector<TDynamicVector<T>>
 public:
   TDynamicMatrix(size_t s = 1) : TDynamicVector<TDynamicVector<T>>(s)
   {
-    for (size_t i = 0; i < sz; i++)
-      pMem[i] = TDynamicVector<T>(sz);
+      for (size_t i = 0; i < sz; i++)
+        pMem[i] = TDynamicVector<T>(sz);
   }
 
   using TDynamicVector<TDynamicVector<T>>::operator[];
