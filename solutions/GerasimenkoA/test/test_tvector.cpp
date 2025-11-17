@@ -213,11 +213,22 @@ TEST(TDynamicVector, cant_subtract_vectors_with_not_equal_size)
 
 TEST(TDynamicVector, can_multiply_vectors_with_equal_size)
 {
-	ADD_FAILURE(); //noexcept
+	TDynamicVector<int> a(4), b(4);
+	for (size_t i = 0; i < 4; ++i) {
+		a[i] = static_cast<int>(i + 1);
+		b[i] = static_cast<int>((i + 1) * 10);
+	}
+	TDynamicVector<int> res;
+	ASSERT_NO_THROW(res = a * b);
+	//EXPECT_EQ(a.size(), res.size());
 }
 
 TEST(TDynamicVector, cant_multiply_vectors_with_not_equal_size)
 {
-	ADD_FAILURE(); //noexcept
+	TDynamicVector<int> a(4), b(5);
+	for (size_t i = 0; i < 4; ++i) a[i] = static_cast<int>(i + 1);
+	for (size_t i = 0; i < 5; ++i) b[i] = static_cast<int>((i + 1) * 10);
+	TDynamicVector<int> res;
+	ASSERT_ANY_THROW(res = a * b);
 }
 

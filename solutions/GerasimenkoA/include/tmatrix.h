@@ -201,8 +201,11 @@ public:
       return result;
   }
 
-  T operator*(const TDynamicVector& v) noexcept(noexcept(T()))
+  T operator*(const TDynamicVector& v)
   {
+      if (sz != v.sz) throw out_of_range("Vectors are of different sizes");
+      if (sz == 0) return 0;
+
       T result = T() ;
       for (size_t i = 0; i < sz; ++i) {
           result += pMem[i] * v.pMem[i];
